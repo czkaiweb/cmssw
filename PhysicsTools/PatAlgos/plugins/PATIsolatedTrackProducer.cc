@@ -22,6 +22,8 @@
 #include "DataFormats/TrackReco/interface/TrackExtraFwd.h"
 #include "DataFormats/TrackReco/interface/DeDxData.h"
 #include "DataFormats/TrackReco/interface/DeDxHitInfo.h"
+#include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
+#include "DataFormats/HcalRecHit/interface/HcalRecHitCollections.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "RecoTracker/DeDx/interface/DeDxTools.h"
@@ -38,6 +40,15 @@
 #include "CondFormats/DataRecord/interface/EcalChannelStatusRcd.h"
 
 #include "MagneticField/Engine/interface/MagneticField.h"
+
+#include "Geometry/CaloGeometry/interface/CaloGeometry.h"
+#include "Geometry/Records/interface/CaloGeometryRecord.h"
+
+struct CaloEnergy
+{
+  double eEM;
+  double eHad;
+};
 
 namespace pat {
 
@@ -108,6 +119,35 @@ namespace pat {
 
     TrackDetectorAssociator trackAssociator_;
     TrackAssociatorParameters trackAssocParameters_;
+
+    virtual bool filter (edm::Event&, const edm::EventSetup&) override;
+    const CaloEnergy calculateCaloE (const PATIsolatedTrack &, const EBRecHitCollection &, const EERecHitCollection &, const HBHERecHitCollection &, const double dR = 0.5) const;
+
+    edm::InputTag tracksTag_;
+    edm::InputTag rhoTag_;
+    edm::InputTag rhoCaloTag_;
+    edm::InputTag rhoCentralCaloTag_;
+    edm::InputTag EBRecHitsTag_;
+    edm::InputTag EERecHitsTag_;
+    edm::InputTag HBHERecHitsTag_;
+//    edm::InputTag gt2dedxPixelTag_;
+//    edm::InputTag gt2dedxStripTag_;
+    double candMinPt_;
+
+    edm::EDGetTokenT<vector<reco::Track> >       tracksToken_;
+    edm::EDGetTokenT<double>                     rhoToken_;
+    edm::EDGetTokenT<double>                     rhoCaloToken_;
+    edm::EDGetTokenT<double>                     rhoCentralCaloToken_;
+    edm::EDGetTokenT<EBRecHitCollection>         EBRecHitsToken_;
+    edm::EDGetTokenT<EERecHitCollection>         EERecHitsToken_;
+    edm::EDGetTokenT<HBHERecHitCollection>       HBHERecHitsToken_;
+//    edm::EDGetTokenT<edm::ValueMap<reco::DeDxData> > gt2dedxStripToken_;
+//    edm::EDGetTokenT<edm::ValueMap<reco::DeDxData> > gt2dedxPixelToken_;
+
+    edm::ESHandle<CaloGeometry> caloGeometry_;
+    bool insideCone(const IsolatedTrack &, const DetId &, const double) const;
+    const GlobalPoint getPosition( const DetId &) const;
+
   };
 }  // namespace pat
 
@@ -146,7 +186,17 @@ pat::PATIsolatedTrackProducer::PATIsolatedTrackProducer(const edm::ParameterSet&
       pcRefNearest_pTmin_(iConfig.getParameter<double>("pcRefNearest_pTmin")),
       pfneutralsum_DR_(iConfig.getParameter<double>("pfneutralsum_DR")),
       saveDeDxHitInfo_(iConfig.getParameter<bool>("saveDeDxHitInfo")),
-      saveDeDxHitInfoCut_(iConfig.getParameter<std::string>("saveDeDxHitInfoCut")) {
+      saveDeDxHitInfoCut_(iConfig.getParameter<std::string>("saveDeDxHitInfoCut")),
+      tracksTag_        (iConfig.getParameter<edm::InputTag> ("tracks")),
+      rhoTag_           (iConfig.getParameter<edm::InputTag> ("rhoTag")),
+      rhoCaloTag_       (iConfig.getParameter<edm::InputTag> ("rhoCaloTag")),
+      rhoCentralCaloTag_(iConfig.getParameter<edm::InputTag> ("rhoCentralCaloTag")),
+      EBRecHitsTag_     (iConfig.getParameter<edm::InputTag> ("EBRecHits")),
+      EERecHitsTag_     (iConfig.getParameter<edm::InputTag> ("EERecHits")),
+      HBHERecHitsTag_   (iConfig.getParameter<edm::InputTag> ("HBHERecHits")),
+//      gt2dedxPixelTag_  (iConfig.getParameter<edm::InputTag> ("dEdxDataPixel")),
+//      gt2dedxStripTag_  (iConfig.getParameter<edm::InputTag> ("dEdxDataStrip")),
+      candMinPt_        (iConfig.getParameter<double> ("candMinPt")) {
   // TrackAssociator parameters
   edm::ParameterSet parameters = iConfig.getParameter<edm::ParameterSet>("TrackAssociatorParameters");
   edm::ConsumesCollector iC = consumesCollector();
@@ -164,6 +214,16 @@ pat::PATIsolatedTrackProducer::PATIsolatedTrackProducer(const edm::ParameterSet&
     produces<reco::DeDxHitInfoCollection>();
     produces<reco::DeDxHitInfoAss>();
   }
+
+  tracksToken_          = consumes<vector<reco::Track> >          (tracksTag_);
+  rhoToken_             = consumes<double>                        (rhoTag_);
+  rhoCaloToken_         = consumes<double>                        (rhoCaloTag_);
+  rhoCentralCaloToken_  = consumes<double>                        (rhoCentralCaloTag_);
+  EBRecHitsToken_       = consumes<EBRecHitCollection>            (EBRecHitsTag_);
+  EERecHitsToken_       = consumes<EERecHitCollection>            (EERecHitsTag_);
+  HBHERecHitsToken_     = consumes<HBHERecHitCollection>          (HBHERecHitsTag_);
+//  gt2dedxPixelToken_    = consumes<edm::ValueMap<reco::DeDxData> > (gt2dedxPixelTag_);
+//  gt2dedxStripToken_    = consumes<edm::ValueMap<reco::DeDxData> > (gt2dedxStripTag_);
 }
 
 pat::PATIsolatedTrackProducer::~PATIsolatedTrackProducer() {}
@@ -219,6 +279,38 @@ void pat::PATIsolatedTrackProducer::produce(edm::Event& iEvent, const edm::Event
   if (addPrescaledDeDxTracks_) {
     iEvent.getByToken(gt2dedxHitInfoPrescale_, gt2dedxHitInfoPrescale);
   }
+
+  edm::Handle<vector<reco::Track> > tracks;
+  iEvent.getByToken (tracksToken_, tracks );
+  edm::Handle<double> rhoHandle;
+  iEvent.getByToken (rhoToken_, rhoHandle );
+  edm::Handle<double> rhoCaloHandle;
+  iEvent.getByToken (rhoCaloToken_, rhoCaloHandle );
+  edm::Handle<double> rhoCentralCaloHandle;
+  iEvent.getByToken (rhoCentralCaloToken_, rhoCentralCaloHandle );
+
+  edm::ESHandle<MagneticField> magneticField;
+  iSetup.get<IdealMagneticFieldRecord>().get(magneticField);
+
+  iSetup.get<CaloGeometryRecord>().get(caloGeometry_);
+  if (!caloGeometry_.isValid())
+    throw cms::Exception("FatalError") << "Unable to find CaloGeometryRecord in event!\n";
+
+  // get ECal Barrel Hits
+  edm::Handle<EBRecHitCollection> EBRecHits;
+  iEvent.getByToken(EBRecHitsToken_, EBRecHits);
+  if (!EBRecHits.isValid()) throw cms::Exception("FatalError") << "Unable to find EBRecHitCollection in the event!\n";
+
+  // get ECal Endcap Hits
+  edm::Handle<EERecHitCollection> EERecHits;
+  iEvent.getByToken(EERecHitsToken_, EERecHits);
+  if (!EERecHits.isValid()) throw cms::Exception("FatalError") << "Unable to find EERecHitCollection in the event!\n";
+
+  // get HCal Barrel/Endcap Hits
+  edm::Handle<HBHERecHitCollection> HBHERecHits;
+  iEvent.getByToken(HBHERecHitsToken_, HBHERecHits);
+  if (!HBHERecHits.isValid()) throw cms::Exception("FatalError") << "Unable to find HBHERecHitCollection in the event!\n";
+
 
   edm::ESHandle<HcalChannelQuality> hcalQ_h;
   iSetup.get<HcalChannelQualityRcd>().get("withTopo", hcalQ_h);
@@ -385,7 +477,9 @@ void pat::PATIsolatedTrackProducer::produce(edm::Event& iEvent, const edm::Event
     if (deltaPhi > 250)
       deltaPhi = 250;
 
-    outPtrP->push_back(pat::IsolatedTrack(isolationDR03,
+
+    pat::IsolatedTrack isolatedTrack = pat::IsolatedTrack(
+                                          isolationDR03,
                                           miniIso,
                                           caloJetEm,
                                           caloJetHad,
@@ -409,7 +503,52 @@ void pat::PATIsolatedTrackProducer::produce(edm::Event& iEvent, const edm::Event
                                           deltaPhi,
                                           refToCand,
                                           refToNearestPF,
-                                          refToNearestLostTrack));
+                                          refToNearestLostTrack,
+                                          gentk,
+                                          generalTracks);
+    isolatedTrack.set_rhoPUCorr(*rhoHandle);
+    isolatedTrack.set_rhoPUCorrCalo(*rhoCaloHandle);
+    isolatedTrack.set_rhoPUCorrCentralCalo(*rhoCentralCaloHandle);
+
+    const CaloEnergy &caloE_0p5 = calculateCaloE(isolatedTrack, *EBRecHits, *EERecHits, *HBHERecHits, 0.5);
+    isolatedTrack.set_caloNewEMDRp5 (caloE_0p5.eEM);
+    isolatedTrack.set_caloNewHadDRp5 (caloE_0p5.eHad);
+
+    const CaloEnergy &caloE_0p3 = calculateCaloE(isolatedTrack, *EBRecHits, *EERecHits, *HBHERecHits, 0.3);
+    isolatedTrack.set_caloNewEMDRp3 (caloE_0p3.eEM);
+    isolatedTrack.set_caloNewHadDRp3 (caloE_0p3.eHad);
+
+    const CaloEnergy &caloE_0p2 = calculateCaloE(isolatedTrack, *EBRecHits, *EERecHits, *HBHERecHits, 0.2);
+    isolatedTrack.set_caloNewEMDRp2 (caloE_0p2.eEM);
+    isolatedTrack.set_caloNewHadDRp2 (caloE_0p2.eHad);
+
+    const CaloEnergy &caloE_0p1 = calculateCaloE(isolatedTrack, *EBRecHits, *EERecHits, *HBHERecHits, 0.1);
+    isolatedTrack.set_caloNewEMDRp1 (caloE_0p1.eEM);
+    isolatedTrack.set_caloNewHadDRp1 (caloE_0p1.eHad);
+
+   if(gt2dedxPixel->contains(tkref.id())) {
+      isolatedTrack.set_dEdx_pixel((*gt2dedxPixel)[tkref].dEdx(),
+                                   (*gt2dedxPixel)[tkref].dEdxError(),
+                                   (*gt2dedxPixel)[tkref].numberOfSaturatedMeasurements(),
+                                   (*gt2dedxPixel)[tkref].numberOfMeasurements());
+    }
+    else {
+      isolatedTrack.set_dEdx_pixel(-1, -1, 0, 0);
+    }
+
+    if(gt2dedxStrip->contains(tkref.id())) {
+      isolatedTrack.set_dEdx_strip((*gt2dedxStrip)[tkref].dEdx(),
+                                   (*gt2dedxStrip)[tkref].dEdxError(),
+                                   (*gt2dedxStrip)[tkref].numberOfSaturatedMeasurements(),
+                                   (*gt2dedxStrip)[tkref].numberOfMeasurements());
+    }
+    else {
+      candTrack.set_dEdx_strip(-1, -1, 0, 0);
+    }
+
+
+
+    outPtrP->push_back(isolatedTrack);
     outPtrP->back().setStatus(prescaled);
 
     if (saveDeDxHitInfo_) {
@@ -769,6 +908,29 @@ void pat::PATIsolatedTrackProducer::getCaloJetEnergy(const LorentzVector& p4,
     caloJetEm = cJet.emEnergyInEB() + cJet.emEnergyInEE() + cJet.emEnergyInHF();
     caloJetHad = cJet.hadEnergyInHB() + cJet.hadEnergyInHE() + cJet.hadEnergyInHF();
   }
+}
+
+const CaloEnergy
+pat::PATIsolatedTrackproducer::calculateCaloE (const IsolatedTrack &isolatedTrack, const EBRecHitCollection &EBRecHits, const EERecHitCollection &EERecHits, const HBHERecHitCollection &HBHERecHits, const double dR) const
+{
+  double eEM = 0;
+  for (const auto &hit : EBRecHits) {
+    if (insideCone(isolatedTrack, hit.detid(), dR)) {
+      eEM += hit.energy();
+    }
+  }
+  for (const auto &hit : EERecHits) {
+    if (insideCone(isolatedTrack, hit.detid(), dR)) {
+      eEM += hit.energy();
+    }
+  }
+
+  double eHad = 0;
+  for (const auto &hit : HBHERecHits)
+    if (insideCone(isolatedTrack, hit.detid(), dR))
+      eHad += hit.energy();
+
+  return {eEM, eHad};
 }
 
 using pat::PATIsolatedTrackProducer;

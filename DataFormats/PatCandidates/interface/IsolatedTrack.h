@@ -17,7 +17,6 @@
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 #include "DataFormats/PatCandidates/interface/PFIsolation.h"
 
-#define INVALID_VALUE (numeric_limits<int>::min ())
 
 namespace pat {
 
@@ -47,33 +46,33 @@ namespace pat {
           packedCandRef_(PackedCandidateRef()),
           nearestPFPackedCandRef_(PackedCandidateRef()),
           nearestLostTrackPackedCandRef_(PackedCandidateRef()),
-          caloNewEMDRp5_           (INVALID_VALUE),
-          caloNewHadDRp5_          (INVALID_VALUE),
-          caloNewEMDRp3_           (INVALID_VALUE),
-          caloNewHadDRp3_          (INVALID_VALUE),
-          caloNewEMDRp2_           (INVALID_VALUE),
-          caloNewHadDRp2_          (INVALID_VALUE),
-          caloNewEMDRp1_           (INVALID_VALUE),
-          caloNewHadDRp1_          (INVALID_VALUE),
-          rhoPUCorr_               (INVALID_VALUE),
-          rhoPUCorrCalo_           (INVALID_VALUE),
-          rhoPUCorrCentralCalo_    (INVALID_VALUE),
-          trackIsoDRp5_            (INVALID_VALUE),
-          trackIsoDRp3_            (INVALID_VALUE),
-          trackIsoDRp2_            (INVALID_VALUE),
-          trackIsoDRp1_            (INVALID_VALUE),
-          trackIsoNoPUDRp5_        (INVALID_VALUE),
-          trackIsoNoPUDRp3_        (INVALID_VALUE),
-          trackIsoNoPUDRp2_        (INVALID_VALUE),
-	  trackIsoNoPUDRp1_        (INVALID_VALUE),
-	  trackIsoNoFakesDRp5_     (INVALID_VALUE),
-	  trackIsoNoFakesDRp3_     (INVALID_VALUE),
-	  trackIsoNoFakesDRp2_     (INVALID_VALUE),
-	  trackIsoNoFakesDRp1_     (INVALID_VALUE),
-	  trackIsoNoPUNoFakesDRp5_ (INVALID_VALUE),
-	  trackIsoNoPUNoFakesDRp3_ (INVALID_VALUE),
-	  trackIsoNoPUNoFakesDRp2_ (INVALID_VALUE),
-	  trackIsoNoPUNoFakesDRp1_ (INVALID_VALUE) {}
+          caloNewEMDRp5_           (-1.),
+          caloNewHadDRp5_          (-1.),
+          caloNewEMDRp3_           (-1.),
+          caloNewHadDRp3_          (-1.),
+          caloNewEMDRp2_           (-1.),
+          caloNewHadDRp2_          (-1.),
+          caloNewEMDRp1_           (-1.),
+          caloNewHadDRp1_          (-1.),
+          rhoPUCorr_               (-1.),
+          rhoPUCorrCalo_           (-1.),
+          rhoPUCorrCentralCalo_    (-1.),
+          trackIsoDRp5_            (-1.),
+          trackIsoDRp3_            (-1.),
+          trackIsoDRp2_            (-1.),
+          trackIsoDRp1_            (-1.),
+          trackIsoNoPUDRp5_        (-1.),
+          trackIsoNoPUDRp3_        (-1.),
+          trackIsoNoPUDRp2_        (-1.),
+	  trackIsoNoPUDRp1_        (-1.),
+	  trackIsoNoFakesDRp5_     (-1.),
+	  trackIsoNoFakesDRp3_     (-1.),
+	  trackIsoNoFakesDRp2_     (-1.),
+	  trackIsoNoFakesDRp1_     (-1.),
+	  trackIsoNoPUNoFakesDRp5_ (-1.),
+	  trackIsoNoPUNoFakesDRp3_ (-1.),
+	  trackIsoNoPUNoFakesDRp2_ (-1.),
+	  trackIsoNoPUNoFakesDRp1_ (-1.) {}
 
     explicit IsolatedTrack(const PFIsolation& iso,
                            const PFIsolation& miniiso,
@@ -99,7 +98,9 @@ namespace pat {
                            int dPhi,
                            const PackedCandidateRef& pcref,
                            const PackedCandidateRef& refToNearestPF,
-                           const PackedCandidateRef& refToNearestLostTrack)
+                           const PackedCandidateRef& refToNearestLostTrack,
+                           const reco::Track &track,
+                           const vector<reco::Track> &tracks)
         : LeafCandidate(charge, p4, Point(0., 0., 0.), id),
           pfIsolationDR03_(iso),
           miniIsolation_(miniiso),
@@ -123,34 +124,33 @@ namespace pat {
           packedCandRef_(pcref),
           nearestPFPackedCandRef_(refToNearestPF),
           nearestLostTrackPackedCandRef_(refToNearestLostTrack),
-          caloNewEMDRp5_           (INVALID_VALUE),
-          caloNewHadDRp5_          (INVALID_VALUE),
-          caloNewEMDRp3_           (INVALID_VALUE),
-          caloNewHadDRp3_          (INVALID_VALUE),
-          caloNewEMDRp2_           (INVALID_VALUE),
-          caloNewHadDRp2_          (INVALID_VALUE),
-          caloNewEMDRp1_           (INVALID_VALUE),
-          caloNewHadDRp1_          (INVALID_VALUE),
-          rhoPUCorr_               (INVALID_VALUE),
-          rhoPUCorrCalo_           (INVALID_VALUE),
-          rhoPUCorrCentralCalo_    (INVALID_VALUE),
-          trackIsoDRp5_            (INVALID_VALUE),
-          trackIsoDRp3_            (INVALID_VALUE),
-          trackIsoDRp2_            (INVALID_VALUE),
-          trackIsoDRp1_            (INVALID_VALUE),
-          trackIsoNoPUDRp5_        (INVALID_VALUE),
-          trackIsoNoPUDRp3_        (INVALID_VALUE),
-          trackIsoNoPUDRp2_        (INVALID_VALUE),
-          trackIsoNoPUDRp1_        (INVALID_VALUE),
-          trackIsoNoFakesDRp5_     (INVALID_VALUE),
-          trackIsoNoFakesDRp3_     (INVALID_VALUE),
-          trackIsoNoFakesDRp2_     (INVALID_VALUE),
-          trackIsoNoFakesDRp1_     (INVALID_VALUE),
-          trackIsoNoPUNoFakesDRp5_ (INVALID_VALUE),
-          trackIsoNoPUNoFakesDRp3_ (INVALID_VALUE),
-          trackIsoNoPUNoFakesDRp2_ (INVALID_VALUE),
-          trackIsoNoPUNoFakesDRp1_ (INVALID_VALUE) {}
-
+          caloNewEMDRp5_           (-1.),
+          caloNewHadDRp5_          (-1.),
+          caloNewEMDRp3_           (-1.),
+          caloNewHadDRp3_          (-1.),
+          caloNewEMDRp2_           (-1.),
+          caloNewHadDRp2_          (-1.),
+          caloNewEMDRp1_           (-1.),
+          caloNewHadDRp1_          (-1.),
+          rhoPUCorr_               (-1.),
+          rhoPUCorrCalo_           (-1.),
+          rhoPUCorrCentralCalo_    (-1.),
+          trackIsoDRp5_            (getTrackIsolation (track, tracks, false, false, 0.5)),
+          trackIsoDRp3_            (getTrackIsolation (track, tracks, false, false, 0.3)),
+          trackIsoDRp2_            (getTrackIsolation (track, tracks, false, false, 0.2)),
+          trackIsoDRp1_            (getTrackIsolation (track, tracks, false, false, 0.1)),
+          trackIsoNoPUDRp5_        (getTrackIsolation (track, tracks, true, false, 0.5)),
+          trackIsoNoPUDRp3_        (getTrackIsolation (track, tracks, true, false, 0.3)),
+          trackIsoNoPUDRp2_        (getTrackIsolation (track, tracks, true, false, 0.2)),
+          trackIsoNoPUDRp1_        (getTrackIsolation (track, tracks, true, false, 0.1)),
+          trackIsoNoFakesDRp5_     (getTrackIsolation (track, tracks, false, true, 0.5)),
+          trackIsoNoFakesDRp3_     (getTrackIsolation (track, tracks, false, true, 0.3)),
+          trackIsoNoFakesDRp2_     (getTrackIsolation (track, tracks, false, true, 0.2)),
+          trackIsoNoFakesDRp1_     (getTrackIsolation (track, tracks, false, true, 0.1)),
+          trackIsoNoPUNoFakesDRp5_ (getTrackIsolation (track, tracks, true,  true, 0.5)),
+          trackIsoNoPUNoFakesDRp3_ (getTrackIsolation (track, tracks, true,  true, 0.3)),
+          trackIsoNoPUNoFakesDRp2_ (getTrackIsolation (track, tracks, true,  true, 0.2)),
+          trackIsoNoPUNoFakesDRp1_ (getTrackIsolation (track, tracks, true,  true, 0.1)) {}
     ~IsolatedTrack() override {}
 
     const PFIsolation& pfIsolationDR03() const { return pfIsolationDR03_; }
@@ -470,79 +470,81 @@ namespace pat {
     int dEdx_numberOfSaturatedMeasurements_strip_;
     unsigned int dEdx_numberOfMeasurements_strip_;
 
-    const double getTrackIsolation (const reco::Track &track, const vector<reco::Track> &tracks, const bool noPU = true, const bool noFake = true, const double outerDeltaR, const double innerDeltaR= 1.0e-12) const {
+    const double getTrackIsolation (const reco::Track &, const vector<reco::Track> &, const bool, const bool, const double, const double = 1.0e-10) const;
 
-      double sumPt = 0.0;
-
-      for (const auto &t : tracks) {
-        if (noFakes && t.normalizedChi2 () > 20.0)
-          continue;
-        if (noFakes && t.hitPattern ().pixelLayersWithMeasurement () < 2)
-          continue;
-        if (noFakes && t.hitPattern ().trackerLayersWithMeasurement () < 5)
-          continue;
-        if (noFakes && fabs (t.d0 () / t.d0Error ()) > 5.0)
-          continue;
-
-        if (noPU && fabs( track.dz (t.vertex ())) > 3.0 * hypot (track.dzError (), t.dzError ()))
-          continue;
-
-        double dR = deltaR (track, t);
-        if (dR < outerDeltaR && dR > innerDeltaR)
-          sumPt += t.pt ();
-        }   
-
-      return sumPt;
-      };
-
-    const double caloTotNoPU (double, RhoType = All, CaloType = Sum) const{
-      // For reference, see https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Accessing_PF_Isolation_from_AN1
-      double rho;
-      switch (rhoType) {
-        case All:
-          rho = rhoPUCorr();
-          break;
-        case Calo:
-          rho = rhoPUCorrCalo();
-          break;
-        case CentralCalo:
-          rho = rhoPUCorrCentralCalo();
-          break;
-        default:
-          throw cms::Exception("FatalError") << "Unkown or not implemented rho type requested, type:" << rhoType;
-        } 
-  
-      double rawCaloTot = 0.0;
-      int intDR = dR * 10.0;
-      switch (caloType) {
-        case Sum:
-          if(intDR == 5) rawCaloTot = caloNewDRp5();
-          else if(intDR == 3) rawCaloTot = caloNewDRp3();
-          else if(intDR == 2) rawCaloTot = caloNewDRp2();
-          else if(intDR == 1) rawCaloTot = caloNewDRp1();
-          break;
-        case EM:
-          if(intDR == 5) rawCaloTot = caloNewEMDRp5();
-          else if(intDR == 3) rawCaloTot = caloNewEMDRp3();
-          else if(intDR == 2) rawCaloTot = caloNewEMDRp2();
-          else if(intDR == 1) rawCaloTot = caloNewEMDRp1();
-          break;
-        case Had:
-	  if(intDR == 5) rawCaloTot = caloNewHadDRp5();
-	  else if(intDR == 3) rawCaloTot = caloNewHadDRp3();
-	  else if(intDR == 2) rawCaloTot = caloNewHadDRp2();
-	  else if(intDR == 1) rawCaloTot = caloNewHadDRp1();
-	  break; 
-	}	
-  
-      double caloCorr = rho * TMath::Pi() * dR * dR;  // Define effective area as pi*r^2, where r is radius of DeltaR cone.
-      double caloTotNoPU = TMath::Max(0., rawCaloTot - caloCorr);
-      return caloTotNoPU;
-    };
+    const double caloTotNoPU (double, RhoType, CaloType) const;
   };
 
   typedef std::vector<IsolatedTrack> IsolatedTrackCollection;
 
 }  // namespace pat
 
+const double pat::IsolatedTrack::getTrackIsolation (const reco::Track &track, const vector<reco::Track> &tracks, const bool noPU, const bool noFake, const double outerDeltaR, const double innerDeltaR= 1.0e-12) {
+
+  double sumPt = 0.0;
+
+  for (const auto &t : tracks) {
+    if (noFakes && t.normalizedChi2 () > 20.0)
+      continue;
+    if (noFakes && t.hitPattern ().pixelLayersWithMeasurement () < 2)
+      continue;
+    if (noFakes && t.hitPattern ().trackerLayersWithMeasurement () < 5)
+      continue;
+    if (noFakes && fabs (t.d0 () / t.d0Error ()) > 5.0)
+      continue;
+
+    if (noPU && fabs( track.dz (t.vertex ())) > 3.0 * hypot (track.dzError (), t.dzError ()))
+      continue;
+
+    double dR = deltaR (track, t);
+    if (dR < outerDeltaR && dR > innerDeltaR)
+      sumPt += t.pt ();
+  }
+
+  return sumPt;
+}
+
+const double pat::IsolatedTrack::caloTotNoPU (double dR, RhoType = All, CaloType = Sum) {
+// For reference, see https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Accessing_PF_Isolation_from_AN1
+  double rho;
+  switch (rhoType) {
+    case All:
+      rho = rhoPUCorr();
+      break;
+    case Calo:
+      rho = rhoPUCorrCalo();
+      break;
+    case CentralCalo:
+      rho = rhoPUCorrCentralCalo();
+      break;
+    default:
+      throw cms::Exception("FatalError") << "Unkown or not implemented rho type requested, type:" << rhoType;
+  }
+  
+  double rawCaloTot = 0.0;
+  int intDR = dR * 10.0;
+  switch (caloType) {
+    case Sum:
+      if(intDR == 5) rawCaloTot = caloNewDRp5();
+      else if(intDR == 3) rawCaloTot = caloNewDRp3();
+      else if(intDR == 2) rawCaloTot = caloNewDRp2();
+      else if(intDR == 1) rawCaloTot = caloNewDRp1();
+      break;
+    case EM:
+      if(intDR == 5) rawCaloTot = caloNewEMDRp5();
+      else if(intDR == 3) rawCaloTot = caloNewEMDRp3();
+      else if(intDR == 2) rawCaloTot = caloNewEMDRp2();
+      else if(intDR == 1) rawCaloTot = caloNewEMDRp1();
+      break;
+    case Had:
+      if(intDR == 5) rawCaloTot = caloNewHadDRp5();
+      else if(intDR == 3) rawCaloTot = caloNewHadDRp3();
+      else if(intDR == 2) rawCaloTot = caloNewHadDRp2();
+      else if(intDR == 1) rawCaloTot = caloNewHadDRp1();
+      break;
+    }
+  double caloCorr = rho * TMath::Pi() * dR * dR;  // Define effective area as pi*r^2, where r is radius of DeltaR cone.
+  double caloTotNoPU = TMath::Max(0., rawCaloTot - caloCorr);
+  return caloTotNoPU;
+}
 #endif
