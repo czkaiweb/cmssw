@@ -10,8 +10,7 @@
 #include "DataFormats/Histograms/interface/DQMToken.h"
 
 /**
- * The standard DQM module base. For now, this is the same as DQMOneLumiEDAnalyzer,
- * but they can (and will) diverge in the future.
+ * The standard DQM module base.
  */
 class DQMEDAnalyzer : public edm::one::EDProducer<edm::EndRunProducer,
                                                   edm::one::WatchRuns,
@@ -38,20 +37,19 @@ public:
           booker.cd();
           this->bookHistograms(booker, run, setup);
         },
-        run.run(),
         this->moduleDescription().id(),
         this->getCanSaveByLumi());
+    edm::Service<DQMStore>()->enterLumi(run.run(), /* lumi */ 0, this->moduleDescription().id());
   }
 
   void beginLuminosityBlock(edm::LuminosityBlock const& lumi, edm::EventSetup const& setup) final {
-    dqmBeginLuminosityBlock(lumi, setup);
+    edm::Service<DQMStore>()->enterLumi(lumi.run(), lumi.luminosityBlock(), this->moduleDescription().id());
   }
 
   void accumulate(edm::Event const& event, edm::EventSetup const& setup) final { analyze(event, setup); }
 
   void endLuminosityBlockProduce(edm::LuminosityBlock& lumi, edm::EventSetup const& setup) final {
-    dqmEndLuminosityBlock(lumi, setup);
-    edm::Service<DQMStore>()->cloneLumiHistograms(lumi.run(), lumi.luminosityBlock(), this->moduleDescription().id());
+    edm::Service<DQMStore>()->leaveLumi(lumi.run(), lumi.luminosityBlock(), this->moduleDescription().id());
     lumi.emplace(lumiToken_);
   }
 
@@ -60,8 +58,7 @@ public:
   void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&) final{};
 
   void endRunProduce(edm::Run& run, edm::EventSetup const& setup) final {
-    dqmEndRun(run, setup);
-    edm::Service<DQMStore>()->cloneRunHistograms(run.run(), this->moduleDescription().id());
+    edm::Service<DQMStore>()->leaveLumi(run.run(), /* lumi */ 0, this->moduleDescription().id());
     run.emplace<DQMToken>(runToken_);
   }
 
@@ -72,10 +69,7 @@ public:
   // methods to be implemented by the user, in order of invocation
   virtual void dqmBeginRun(edm::Run const&, edm::EventSetup const&) {}
   virtual void bookHistograms(DQMStore::IBooker&, edm::Run const&, edm::EventSetup const&) = 0;
-  virtual void dqmBeginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&) {}
   virtual void analyze(edm::Event const&, edm::EventSetup const&) {}
-  virtual void dqmEndLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&) {}
-  virtual void dqmEndRun(edm::Run const&, edm::EventSetup const&) {}
 
 protected:
   edm::EDPutTokenT<DQMToken> runToken_;
