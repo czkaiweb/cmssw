@@ -511,20 +511,8 @@ void pat::PATIsolatedTrackProducer::produce(edm::Event& iEvent, const edm::Event
     isolatedTrack.set_rhoPUCorrCentralCalo(*rhoCentralCaloHandle);
 
     const CaloEnergy &caloE_0p5 = calculateCaloE(isolatedTrack, *EBRecHits, *EERecHits, *HBHERecHits, 0.5);
-    isolatedTrack.set_caloNewEMDRp5 (caloE_0p5.eEM);
-    isolatedTrack.set_caloNewHadDRp5 (caloE_0p5.eHad);
-
-    const CaloEnergy &caloE_0p3 = calculateCaloE(isolatedTrack, *EBRecHits, *EERecHits, *HBHERecHits, 0.3);
-    isolatedTrack.set_caloNewEMDRp3 (caloE_0p3.eEM);
-    isolatedTrack.set_caloNewHadDRp3 (caloE_0p3.eHad);
-
-    const CaloEnergy &caloE_0p2 = calculateCaloE(isolatedTrack, *EBRecHits, *EERecHits, *HBHERecHits, 0.2);
-    isolatedTrack.set_caloNewEMDRp2 (caloE_0p2.eEM);
-    isolatedTrack.set_caloNewHadDRp2 (caloE_0p2.eHad);
-
-    const CaloEnergy &caloE_0p1 = calculateCaloE(isolatedTrack, *EBRecHits, *EERecHits, *HBHERecHits, 0.1);
-    isolatedTrack.set_caloNewEMDRp1 (caloE_0p1.eEM);
-    isolatedTrack.set_caloNewHadDRp1 (caloE_0p1.eHad);
+    isolatedTrack.set_caloEMDR5 (caloE_0p5.eEM);
+    isolatedTrack.set_caloHadDR5 (caloE_0p5.eHad);
 
    if(gt2dedxPixel->contains(tkref.id())) {
       isolatedTrack.set_dEdx_pixel((*gt2dedxPixel)[tkref].dEdx(),
