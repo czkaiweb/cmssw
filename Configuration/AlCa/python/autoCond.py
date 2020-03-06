@@ -26,13 +26,13 @@ autoCond = {
     # GlobalTag for MC production (p-Pb collisions) with realistic alignment and calibrations for Run2
     'run2_mc_pa'        :   '110X_mcRun2_pA_v3',
     # GlobalTag for Run1 data reprocessing
-    'run1_data'         :   '110X_dataRun2_v10',
+    'run1_data'         :   '111X_dataRun2_v2',
     # GlobalTag for Run2 data reprocessing
-    'run2_data'         :   '110X_dataRun2_v10',
+    'run2_data'         :   '111X_dataRun2_v2',
     # GlobalTag for Run2 data 2018B relvals only: HEM-15-16 fail
-    'run2_data_HEfail' : '110X_dataRun2_HEfail_v1',
+    'run2_data_HEfail'  :   '111X_dataRun2_HEfail_v2',
     # GlobalTag for Run2 data relvals: allows customization to run with fixed L1 menu
-    'run2_data_relval'  :   '110X_dataRun2_relval_v10',
+    'run2_data_relval'  :   '111X_dataRun2_relval_v2',
     # GlobalTag for Run2 HI data
     'run2_data_promptlike_hi' : '110X_dataRun2_PromptLike_HI_v10',
     # GlobalTag for Run1 HLT: it points to the online GT
@@ -45,7 +45,7 @@ autoCond = {
     # GlobalTag for Run2 HLT for HI (not 2018 HI): it points to the online GT
     'run2_hlt_hi'       :   '101X_dataRun2_HLTHI_frozen_v9',
     # GlobalTag for Run3 data relvals
-    'run3_data_promptlike'         :   '106X_dataRun3_Prompt_v5',
+    'run3_data_promptlike'     :   '110X_dataRun3_Prompt_v3',
     # GlobalTag for MC production with perfectly aligned and calibrated detector for Phase1 2017 (and 0,0,~0-centred beamspot)
     'phase1_2017_design'       :  '110X_mc2017_design_v3',
     # GlobalTag for MC production with realistic conditions for Phase1 2017 detector
