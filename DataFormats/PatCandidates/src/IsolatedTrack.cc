@@ -1,4 +1,4 @@
-#include "/uscms/home/kwei726/nobackup/IsoTrkDevelopment/CMSSW_10_2_14/src/DataFormats/PatCandidates/interface/IsolatedTrack.h"
+#include "/DataFormats/PatCandidates/interface/IsolatedTrack.h"
 
 #include "DataFormats/Math/interface/deltaR.h"
 #include "TMath.h"
