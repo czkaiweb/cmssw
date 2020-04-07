@@ -1,8 +1,11 @@
-#include "DataFormats/PatCandidates/interface/IsolatedTrack.h"
+#include "/uscms/home/kwei726/nobackup/IsoTrkDevelopment/CMSSW_10_2_14/src/DataFormats/PatCandidates/interface/IsolatedTrack.h"
+
+#include "DataFormats/Math/interface/deltaR.h"
+#include "TMath.h"
 
 using namespace pat;
 
-const double pat::IsolatedTrack::getTrackIsolation (const reco::Track &track, const vector<reco::Track> &tracks, const double outerDeltaR, const double innerDeltaR= 1.0e-12) {
+const double pat::IsolatedTrack::getTrackIsolation (const reco::Track &track, const std::vector<reco::Track> &tracks, const double outerDeltaR, const double innerDeltaR) const{
 
   double sumPt = 0.0;
 
@@ -19,7 +22,7 @@ const double pat::IsolatedTrack::getTrackIsolation (const reco::Track &track, co
   return sumPt;
 }
 
-const double pat::IsolatedTrack::caloTotDR5NoPU ( RhoType rhoType = All, CaloType caloType = Sum) {
+const double pat::IsolatedTrack::CaloTotDR05NoPU ( RhoType rhoType = All, CaloType caloType = Sum) const{
 // For reference, see https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#Accessing_PF_Isolation_from_AN1
   double rho;
   switch (rhoType) {
@@ -41,11 +44,11 @@ const double pat::IsolatedTrack::caloTotDR5NoPU ( RhoType rhoType = All, CaloTyp
   int intDR = dR * 10.0;
   switch (caloType) {
     case Sum:
-      rawCaloTot = caloDR5();
+      rawCaloTot = assocCaloDR05();
     case EM:
-      rawCaloTot = caloEMDR5();
+      rawCaloTot = assocEMCaloDR05();
     case Had:
-      rawCaloTot = caloHadDR5();
+      rawCaloTot = assocHadCaloDR05();
     default:
       throw cms::Exception("FatalError")<< "Unknown or not implemented calo type requested, type:" << caloType;
     }
@@ -53,3 +56,20 @@ const double pat::IsolatedTrack::caloTotDR5NoPU ( RhoType rhoType = All, CaloTyp
   double caloTotNoPU = TMath::Max(0., rawCaloTot - caloCorr);
   return caloTotNoPU;
 }
+
+//////////////////////////////////////
+// Rho-corrected calo energies
+//////////////////////////////////////
+
+const float pat::IsolatedTrack::assocAllCaloDR05NoPU ()                const { return CaloTotDR05NoPU(All, Sum); };
+const float pat::IsolatedTrack::assocAllEMCaloDR05NoPU ()              const { return CaloTotDR05NoPU(All, EM); };
+const float pat::IsolatedTrack::assocAllHadCaloDR05NoPU ()             const { return CaloTotDR05NoPU(All, Had); };
+
+const float pat::IsolatedTrack::assocCaloDR05NoPUCalo ()               const { return CaloTotDR05NoPU(Calo, Sum); };
+const float pat::IsolatedTrack::assocCaloDR05NoPUCaloEm ()             const { return CaloTotDR05NoPU(Calo, EM); };
+const float pat::IsolatedTrack::assocCaloDR05NoPUCaloHad ()            const { return CaloTotDR05NoPU(Calo, Had); };
+
+const float pat::IsolatedTrack::caloDR05NoPUCentralCalo ()             const { return CaloTotDR05NoPU(CentralCalo, Sum); };
+const float pat::IsolatedTrack::caloDR05NoPUCentralCaloEm ()           const { return CaloTotDR05NoPU(CentralCalo, EM); };
+const float pat::IsolatedTrack::caloDR05NoPUCentralCaloHad ()          const { return CaloTotDR05NoPU(CentralCalo, Had); };
+

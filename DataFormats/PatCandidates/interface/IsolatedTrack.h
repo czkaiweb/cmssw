@@ -17,7 +17,6 @@
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 #include "DataFormats/PatCandidates/interface/PFIsolation.h"
 
-
 namespace pat {
 
     class IsolatedTrack : public reco::LeafCandidate {
@@ -54,7 +53,7 @@ namespace pat {
                                const std::vector<uint32_t> &hcalst, int dEta, int dPhi,
                                const PackedCandidateRef &pcref, const PackedCandidateRef &refToNearestPF, const PackedCandidateRef &refToNearestLostTrack,
                                const reco::Track &track,
-                               const vector<reco::Track> &tracks):
+                               const std::vector<reco::Track> &tracks):
           LeafCandidate(charge, p4, Point(0.,0.,0.), id),
           pfIsolationDR03_(iso), miniIsolation_(miniiso),
           matchedCaloJetEmEnergy_(caloJetEm), matchedCaloJetHadEnergy_(caloJetHad),
@@ -72,7 +71,7 @@ namespace pat {
           rhoPUCorr_               (-1.),
           rhoPUCorrCalo_           (-1.),
           rhoPUCorrCentralCalo_    (-1.),
-          trackIsoDRp5_            (getTrackIsolation (track, tracks, 0.5)){}
+          trackIsoDR05_            (getTrackIsolation (track, tracks, 0.5)){}
 
         ~IsolatedTrack() override {}
 
@@ -142,24 +141,24 @@ namespace pat {
        //////////////////////////////////////
 
        // New calculation that uses all rec hits in dR < 0.5 cone.
-       const float assocAllCaloDR05NoPU ()                   const { return CaloTotDR05NoPU(All, Sum); };
-       const float assocAllEMCaloDR05NoPU ()                 const { return CaloTotDR05NoPU(All, EM); };
-       const float assocAllHadCaloDR05NoPU ()                const { return CaloTotDR05NoPU(All, Had); };
+       const float assocAllCaloDR05NoPU ()           const;
+       const float assocAllEMCaloDR05NoPU ()         const;
+       const float assocAllHadCaloDR05NoPU ()        const;
      
-       const float assocCaloDR05NoPUCalo ()               const { return CaloTotDR05NoPU(Calo, Sum); };
-       const float assocCaloDR5NoPUCaloEm ()             const { return CaloTotDR05NoPU(Calo, EM); };
-       const float assocCaloDR5NoPUCaloHad ()            const { return CaloTotDR05NoPU(Calo, Had); };
+       const float assocCaloDR05NoPUCalo ()          const;
+       const float assocCaloDR05NoPUCaloEm ()        const;
+       const float assocCaloDR05NoPUCaloHad ()       const;
 
-       const float caloDR5NoPUCentralCalo ()        const { return CaloTotDR05NoPU(CentralCalo, Sum); };
-       const float caloDR5NoPUCentralCaloJEm ()     const { return CaloTotDR05NoPU(CentralCalo, EM); };
-       const float caloDR5NoPUCentralCaloHad ()     const { return CaloTotDR05NoPU(CentralCalo, Had); };
+       const float caloDR05NoPUCentralCalo ()        const;
+       const float caloDR05NoPUCentralCaloEm ()      const;
+       const float caloDR05NoPUCentralCaloHad ()     const;
 
        //////////////////////////////////////
        // Set calo energies
        //////////////////////////////////////
 
-       void set_caloEMDR5 (double value) { caloEMDR5_  = value; };
-       void set_caloHadDR5(double value) { caloHadDR5_ = value; };
+       void set_assocEMCaloDR05 (double value) { assocEMCaloDR05_  = value; };
+       void set_assocHadCaloDR05 (double value) { assocHadCaloDR05_ = value; };
 
        //////////////////////////////////////
        // Set rhos
@@ -173,13 +172,13 @@ namespace pat {
        // Set track isolations
        //////////////////////////////////////
 
-       void set_trackIsoDRp5 (double value) { trackIsoDRp5_ = value; };
+       void set_trackIsoDR05 (double value) { trackIsoDR05_ = value; };
 
-       void set_trackIsoNoPUDRp5 (double value) { trackIsoNoPUDRp5_ = value; };
+       void set_trackIsoNoPUDR05 (double value) { trackIsoNoPUDR05_ = value; };
 
-       void set_trackIsoNoFakesDRp5 (double value) { trackIsoNoFakesDRp5_ = value; };
+       void set_trackIsoNoFakesDR05 (double value) { trackIsoNoFakesDR05_ = value; };
 
-       void set_trackIsoNoPUNoFakesDRp5 (double value) { trackIsoNoPUNoFakesDRp5_ = value; };
+       void set_trackIsoNoPUNoFakesDR05 (double value) { trackIsoNoPUNoFakesDR05_ = value; };
 
        void set_dEdx_pixel (double value, 
                             double error, 
@@ -212,7 +211,7 @@ namespace pat {
        // Get track isolations
        //////////////////////////////////////
 
-       const float trackIsoDRp5 ()            const { return this->trackIsoDRp5_; };
+       const float trackIsoDR05 ()            const { return this->trackIsoDR05_; };
 
        const float dEdx_pixel                      () const { return this->dEdx_pixel_; };
        const float dEdxError_pixel                 () const { return this->dEdxError_pixel_; };
@@ -255,14 +254,17 @@ namespace pat {
        PackedCandidateRef nearestPFPackedCandRef_;
        PackedCandidateRef nearestLostTrackPackedCandRef_;
    
-       float caloEMDR5_;
-       float caloHadDR5_;
+       float assocEMCaloDR05_;
+       float assocHadCaloDR05_;
    
        float rhoPUCorr_;
        float rhoPUCorrCalo_;
        float rhoPUCorrCentralCalo_;
    
-       float trackIsoDRp5_;
+       float trackIsoDR05_;
+       float trackIsoNoPUDR05_;
+       float trackIsoNoFakesDR05_;
+       float trackIsoNoPUNoFakesDR05_;
    
        float dEdx_pixel_;
        float dEdxError_pixel_;
@@ -274,9 +276,9 @@ namespace pat {
        int dEdx_numberOfSaturatedMeasurements_strip_;
        unsigned int dEdx_numberOfMeasurements_strip_;
    
-       const double getTrackIsolation (const reco::Track &, const vector<reco::Track> &, const bool, const bool, const double, const double = 1.0e-10) const;
+       const double getTrackIsolation (const reco::Track &, const std::vector<reco::Track> &, const double, const double = 1.0e-10) const;
    
-       const double caloTotDR5NoPU (RhoType, CaloType) const;
+       const double CaloTotDR05NoPU (RhoType, CaloType) const;
 
      };
    
