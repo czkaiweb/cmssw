@@ -43,6 +43,8 @@
 
 #include "Geometry/CaloGeometry/interface/CaloGeometry.h"
 #include "Geometry/Records/interface/CaloGeometryRecord.h"
+#include "Geometry/CaloGeometry/interface/CaloSubdetectorGeometry.h"
+#include "Geometry/CaloGeometry/interface/CaloCellGeometry.h"
 
 struct CaloEnergy
 {
@@ -114,8 +116,7 @@ namespace pat {
           TrackDetectorAssociator trackAssociator_;
           TrackAssociatorParameters trackAssocParameters_;
 
-          virtual bool filter (edm::Event&, const edm::EventSetup&) override;
-          const CaloEnergy calculateCaloE (const PATIsolatedTrack &, const EBRecHitCollection &, const EERecHitCollection &, const HBHERecHitCollection &, const double dR = 0.5) const;
+          const CaloEnergy calculateCaloE (const pat::IsolatedTrack &, const EBRecHitCollection &, const EERecHitCollection &, const HBHERecHitCollection &, const double dR = 0.5) const;
 
           edm::InputTag tracksTag_;
           edm::InputTag rhoTag_;
@@ -128,7 +129,7 @@ namespace pat {
 //          edm::InputTag gt2dedxStripTag_;
           double candMinPt_;
 
-          edm::EDGetTokenT<vector<reco::Track> >       tracksToken_;
+          edm::EDGetTokenT<std::vector<reco::Track> >       tracksToken_;
           edm::EDGetTokenT<double>                     rhoToken_;
           edm::EDGetTokenT<double>                     rhoCaloToken_;
           edm::EDGetTokenT<double>                     rhoCentralCaloToken_;
@@ -139,7 +140,7 @@ namespace pat {
 //          edm::EDGetTokenT<edm::ValueMap<reco::DeDxData> > gt2dedxPixelToken_;
 
           edm::ESHandle<CaloGeometry> caloGeometry_;
-          bool insideCone(const IsolatedTrack &, const DetId &, const double) const;
+          bool insideCone(const pat::IsolatedTrack &, const DetId &, const double) const;
           const GlobalPoint getPosition( const DetId &) const;
 
     };
@@ -207,7 +208,7 @@ pat::PATIsolatedTrackProducer::PATIsolatedTrackProducer(const edm::ParameterSet&
     produces<reco::DeDxHitInfoAss>();
   }
 
-  tracksToken_          = consumes<vector<reco::Track> >          (tracksTag_);
+  tracksToken_          = consumes<std::vector<reco::Track> >          (tracksTag_);
   rhoToken_             = consumes<double>                        (rhoTag_);
   rhoCaloToken_         = consumes<double>                        (rhoCaloTag_);
   rhoCentralCaloToken_  = consumes<double>                        (rhoCentralCaloTag_);
@@ -272,7 +273,7 @@ void pat::PATIsolatedTrackProducer::produce(edm::Event& iEvent, const edm::Event
     iEvent.getByToken(gt2dedxHitInfoPrescale_, gt2dedxHitInfoPrescale);
   }
 
-  edm::Handle<vector<reco::Track> > tracks;
+  edm::Handle<std::vector<reco::Track> > tracks;
   iEvent.getByToken (tracksToken_, tracks );
   edm::Handle<double> rhoHandle;
   iEvent.getByToken (rhoToken_, rhoHandle );
@@ -497,14 +498,14 @@ void pat::PATIsolatedTrackProducer::produce(edm::Event& iEvent, const edm::Event
                                           refToNearestPF,
                                           refToNearestLostTrack,
                                           gentk,
-                                          generalTracks);
+                                          *gt_h);
     isolatedTrack.set_rhoPUCorr(*rhoHandle);
     isolatedTrack.set_rhoPUCorrCalo(*rhoCaloHandle);
     isolatedTrack.set_rhoPUCorrCentralCalo(*rhoCentralCaloHandle);
 
     const CaloEnergy &caloE_0p5 = calculateCaloE(isolatedTrack, *EBRecHits, *EERecHits, *HBHERecHits, 0.5);
-    isolatedTrack.set_caloEMDR5 (caloE_0p5.eEM);
-    isolatedTrack.set_caloHadDR5 (caloE_0p5.eHad);
+    isolatedTrack.set_assocEMCaloDR05 (caloE_0p5.eEM);
+    isolatedTrack.set_assocHadCaloDR05 (caloE_0p5.eHad);
 
    if(gt2dedxPixel->contains(tkref.id())) {
       isolatedTrack.set_dEdx_pixel((*gt2dedxPixel)[tkref].dEdx(),
@@ -523,7 +524,7 @@ void pat::PATIsolatedTrackProducer::produce(edm::Event& iEvent, const edm::Event
                                    (*gt2dedxStrip)[tkref].numberOfMeasurements());
     }
     else {
-      candTrack.set_dEdx_strip(-1, -1, 0, 0);
+      isolatedTrack.set_dEdx_strip(-1, -1, 0, 0);
     }
 
 
@@ -609,6 +610,9 @@ void pat::PATIsolatedTrackProducer::produce(edm::Event& iEvent, const edm::Event
     if (refToNearestLostTrack_idx != -1)
       refToNearestLostTrack = pat::PackedCandidateRef(lt_h, refToNearestLostTrack_idx);
 
+    reco::Track gentk;
+    reco::TrackCollection gentks;
+
     // fill with default values
     reco::HitPattern hp;
     float dEdxPixel = -1, dEdxStrip = -1;
@@ -618,31 +622,24 @@ void pat::PATIsolatedTrackProducer::produce(edm::Event& iEvent, const edm::Event
     int deltaEta = 0;
     int deltaPhi = 0;
 
-    outPtrP->push_back(pat::IsolatedTrack(isolationDR03,
-                                          miniIso,
-                                          caloJetEm,
-                                          caloJetHad,
-                                          pfLepOverlap,
-                                          pfNeutralSum,
-                                          p4,
-                                          charge,
-                                          pdgId,
-                                          dz,
-                                          dxy,
-                                          dzError,
-                                          dxyError,
-                                          hp,
-                                          dEdxStrip,
-                                          dEdxPixel,
-                                          fromPV,
-                                          trackQuality,
-                                          ecalStatus,
-                                          hcalStatus,
-                                          deltaEta,
-                                          deltaPhi,
-                                          refToCand,
-                                          refToNearestPF,
-                                          refToNearestLostTrack));
+    pat::IsolatedTrack isolatedTrack = pat::IsolatedTrack(isolationDR03, miniIso, caloJetEm, caloJetHad, pfLepOverlap, pfNeutralSum, p4,
+                                              charge, pdgId, dz, dxy, dzError, dxyError,
+                                              hp, dEdxStrip, dEdxPixel, fromPV, trackQuality,
+                                              ecalStatus, hcalStatus, deltaEta, deltaPhi, refToCand,
+					      refToNearestPF, refToNearestLostTrack,gentk,gentks);
+
+    isolatedTrack.set_rhoPUCorr(*rhoHandle);
+    isolatedTrack.set_rhoPUCorrCalo(*rhoCaloHandle);
+    isolatedTrack.set_rhoPUCorrCentralCalo(*rhoCentralCaloHandle);
+
+    const CaloEnergy &caloE_0p5 = calculateCaloE(isolatedTrack, *EBRecHits, *EERecHits, *HBHERecHits, 0.5);
+    isolatedTrack.set_assocEMCaloDR05 (caloE_0p5.eEM);
+    isolatedTrack.set_assocHadCaloDR05 (caloE_0p5.eHad);
+
+    isolatedTrack.set_dEdx_pixel(-1, -1, 0, 0);
+    isolatedTrack.set_dEdx_strip(-1, -1, 0, 0);
+    
+    outPtrP->push_back(isolatedTrack);
 
     dEdXass.push_back(-1);  // these never have dE/dx hit info, as there's no track
   }
@@ -891,7 +888,7 @@ void pat::PATIsolatedTrackProducer::getCaloJetEnergy(const LorentzVector& p4,
 }
 
 const CaloEnergy
-pat::PATIsolatedTrackproducer::calculateCaloE (const IsolatedTrack &isolatedTrack, const EBRecHitCollection &EBRecHits, const EERecHitCollection &EERecHits, const HBHERecHitCollection &HBHERecHits, const double dR) const
+pat::PATIsolatedTrackProducer::calculateCaloE (const pat::IsolatedTrack &isolatedTrack, const EBRecHitCollection &EBRecHits, const EERecHitCollection &EERecHits, const HBHERecHitCollection &HBHERecHits, const double dR) const
 {
   double eEM = 0;
   for (const auto &hit : EBRecHits) {
@@ -912,7 +909,27 @@ pat::PATIsolatedTrackproducer::calculateCaloE (const IsolatedTrack &isolatedTrac
 
   return {eEM, eHad};
 }
+bool 
+pat::PATIsolatedTrackProducer::insideCone(const pat::IsolatedTrack& isolatedTrack, const DetId& id, const double dR) const
+{
+   const GlobalPoint &idPosition = getPosition(id);
+   if (idPosition.mag()<0.01) return false;
 
+   math::XYZVector idPositionRoot( idPosition.x(), idPosition.y(), idPosition.z() );
+   return deltaR(isolatedTrack, idPositionRoot) < dR;
+}
+
+const GlobalPoint 
+pat::PATIsolatedTrackProducer::getPosition( const DetId& id) const
+{
+   if ( ! caloGeometry_.isValid() ||
+        ! caloGeometry_->getSubdetectorGeometry(id) ||
+        ! caloGeometry_->getSubdetectorGeometry(id)->getGeometry(id) ) {
+      throw cms::Exception("FatalError") << "Failed to access geometry for DetId: " << id.rawId();
+      return GlobalPoint(0,0,0);
+   }
+   return caloGeometry_->getSubdetectorGeometry(id)->getGeometry(id)->getPosition();
+}
 using pat::PATIsolatedTrackProducer;
 #include "FWCore/Framework/interface/MakerMacros.h"
 DEFINE_FWK_MODULE(PATIsolatedTrackProducer);
