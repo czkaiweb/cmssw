@@ -1,4 +1,4 @@
-#include "/DataFormats/PatCandidates/interface/IsolatedTrack.h"
+#include "DataFormats/PatCandidates/interface/IsolatedTrack.h"
 
 #include "DataFormats/Math/interface/deltaR.h"
 #include "TMath.h"
