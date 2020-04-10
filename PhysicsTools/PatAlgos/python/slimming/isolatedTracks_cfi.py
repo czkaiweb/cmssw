@@ -35,6 +35,15 @@ isolatedTracks = cms.EDProducer("PATIsolatedTrackProducer",
     dEdxDataPixel = cms.InputTag("dedxPixelHarmonic2"),
     dEdxHitInfo = cms.InputTag("dedxHitInfo"),
     dEdxHitInfoPrescale = cms.InputTag("dedxHitInfo","prescale"), 
+    tracks             =  cms.InputTag  ("generalTracks",                  ""),
+    rhoTag             =  cms.InputTag  ("fixedGridRhoFastjetAll"),
+    rhoCaloTag         =  cms.InputTag  ("fixedGridRhoFastjetAllCalo"),
+    rhoCentralCaloTag  =  cms.InputTag  ("fixedGridRhoFastjetCentralCalo"),
+    EBRecHits          =  cms.InputTag  ("reducedEcalRecHitsEB"),
+    EERecHits          =  cms.InputTag  ("reducedEcalRecHitsEE"),
+    HBHERecHits        =  cms.InputTag  ("reducedHcalRecHits", "hbhereco"),
+    candMinPt          =  cms.double(10),
+
     addPrescaledDeDxTracks = cms.bool(False),
     usePrecomputedDeDxStrip = cms.bool(True),        # if these are set to True, will get estimated DeDx from DeDxData branches
     usePrecomputedDeDxPixel = cms.bool(True),        # if set to False, will manually compute using dEdxHitInfo
@@ -60,6 +69,7 @@ isolatedTracks = cms.EDProducer("PATIsolatedTrackProducer",
 
     saveDeDxHitInfo = cms.bool(True),
     saveDeDxHitInfoCut = cms.string("(%s) || (%s)" % (_susySoftDisappearingTrackCut,_exoHighPtTrackCut)), 
+
 )
 
 def miniAOD_customizeIsolatedTracksFastSim(process):
