@@ -101,14 +101,6 @@ namespace pat {
 
        const reco::HitPattern& hitPattern() const { return hitPattern_; }
 
-       float dEdxStrip()   const { return dEdxStrip_; }
-       float dEdxStrip_Error                 () const { return this->dEdxStrip_Error_; };
-       int dEdxStrip_nSaturatedMeasurements  () const { return this->dEdxStrip_numberOfSaturatedMeasurements_; };
-       unsigned int dEdx_Strip_nMeasurements () const { return this->dEdxStrip_numberOfMeasurements_; };
-       float dEdxPixel() const { return dEdxPixel_; }
-       float dEdxPixel_Error                 () const { return this->dEdxPixel_Error_; };
-       int dEdxPixel_nSaturatedMeasurements  () const { return this->dEdxPixel_numberOfSaturatedMeasurements_; };
-       unsigned int dEdx_Pixel_nMeasurements () const { return this->dEdxPixel_numberOfMeasurements_; };
 
        //! just the status code part of an EcalChannelStatusCode for all crossed Ecal cells
        const std::vector<uint16_t>& crossedEcalStatus() const { return crossedEcalStatus_; }
@@ -184,19 +176,19 @@ namespace pat {
                             double error, 
                             int nSaturatedMeasurements, 
                             unsigned int nMeasurements) { 
-           dEdx_pixel_ = value; 
-           dEdxError_pixel_ = error;
-           dEdx_numberOfSaturatedMeasurements_pixel_ = nSaturatedMeasurements;
-           dEdx_numberOfMeasurements_pixel_ = nMeasurements;
+           dEdxPixel_ = value; 
+           dEdxPixel_Error_ = error;
+           dEdxPixel_numberOfSaturatedMeasurements_ = nSaturatedMeasurements;
+           dEdxPixel_numberOfMeasurements_ = nMeasurements;
        };
        void set_dEdx_strip (double value, 
                            double error, 
                            int nSaturatedMeasurements, 
                            unsigned int nMeasurements) { 
-           dEdx_strip_ = value; 
-           dEdxError_strip_ = error;
-           dEdx_numberOfSaturatedMeasurements_strip_ = nSaturatedMeasurements;
-           dEdx_numberOfMeasurements_strip_ = nMeasurements;
+           dEdxStrip_ = value; 
+           dEdxStrip_Error_ = error;
+           dEdxStrip_numberOfSaturatedMeasurements_ = nSaturatedMeasurements;
+           dEdxStrip_numberOfMeasurements_ = nMeasurements;
        };
 
        //////////////////////////////////////
@@ -213,15 +205,14 @@ namespace pat {
 
        const float trackIsoDR05 ()            const { return this->trackIsoDR05_; };
 
-       const float dEdx_pixel                      () const { return this->dEdx_pixel_; };
-       const float dEdxError_pixel                 () const { return this->dEdxError_pixel_; };
-       const int dEdx_nSaturatedMeasurements_pixel () const { return this->dEdx_numberOfSaturatedMeasurements_pixel_; };
-       const unsigned int dEdx_nMeasurements_pixel () const { return this->dEdx_numberOfMeasurements_pixel_; };
-
-       const float dEdx_strip                      () const { return this->dEdx_strip_; };
-       const float dEdxError_strip                 () const { return this->dEdxError_strip_; };
-       const int dEdx_nSaturatedMeasurements_strip () const { return this->dEdx_numberOfSaturatedMeasurements_strip_; };
-       const unsigned int dEdx_nMeasurements_strip () const { return this->dEdx_numberOfMeasurements_strip_; };
+       float dEdxStrip()   const { return dEdxStrip_; }
+       float dEdxStrip_Error                 () const { return this->dEdxStrip_Error_; };
+       int dEdxStrip_nSaturatedMeasurements  () const { return this->dEdxStrip_numberOfSaturatedMeasurements_; };
+       unsigned int dEdxStrip_nMeasurements  () const { return this->dEdxStrip_numberOfMeasurements_; };
+       float dEdxPixel()  const { return dEdxPixel_; }
+       float dEdxPixel_Error                 () const { return this->dEdxPixel_Error_; };
+       int dEdxPixel_nSaturatedMeasurements  () const { return this->dEdxPixel_numberOfSaturatedMeasurements_; };
+       unsigned int dEdxPixel_nMeasurements  () const { return this->dEdxPixel_numberOfMeasurements_; };
 
        // missing hits differentiated by location on track
        // re-implement these methods from osu::Track to provide a getter function when plotting osu::Track::matchedCandidateTrack()
@@ -265,16 +256,6 @@ namespace pat {
        float trackIsoNoPUDR05_;
        float trackIsoNoFakesDR05_;
        float trackIsoNoPUNoFakesDR05_;
-   
-       float dEdx_pixel_;
-       float dEdxError_pixel_;
-       int dEdx_numberOfSaturatedMeasurements_pixel_;
-       unsigned int dEdx_numberOfMeasurements_pixel_;
-   
-       float dEdx_strip_;
-       float dEdxError_strip_;
-       int dEdx_numberOfSaturatedMeasurements_strip_;
-       unsigned int dEdx_numberOfMeasurements_strip_;
    
        const double getTrackIsolation (const reco::Track &, const std::vector<reco::Track> &, const double, const double = 1.0e-10) const;
    
