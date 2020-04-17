@@ -61,15 +61,15 @@ const double pat::IsolatedTrack::CaloTotDR05NoPU ( RhoType rhoType = All, CaloTy
 // Rho-corrected calo energies
 //////////////////////////////////////
 
-const float pat::IsolatedTrack::assocAllCaloDR05NoPU ()                const { return CaloTotDR05NoPU(All, Sum); };
-const float pat::IsolatedTrack::assocAllEMCaloDR05NoPU ()              const { return CaloTotDR05NoPU(All, EM); };
-const float pat::IsolatedTrack::assocAllHadCaloDR05NoPU ()             const { return CaloTotDR05NoPU(All, Had); };
+const float pat::IsolatedTrack::assocCaloDR05NoPU ()                const { return CaloTotDR05NoPU(All, Sum); };
+const float pat::IsolatedTrack::assocEMCaloDR05NoPU ()              const { return CaloTotDR05NoPU(All, EM); };
+const float pat::IsolatedTrack::assocHadCaloDR05NoPU ()             const { return CaloTotDR05NoPU(All, Had); };
 
 const float pat::IsolatedTrack::assocCaloDR05NoPUCalo ()               const { return CaloTotDR05NoPU(Calo, Sum); };
-const float pat::IsolatedTrack::assocCaloDR05NoPUCaloEm ()             const { return CaloTotDR05NoPU(Calo, EM); };
-const float pat::IsolatedTrack::assocCaloDR05NoPUCaloHad ()            const { return CaloTotDR05NoPU(Calo, Had); };
+const float pat::IsolatedTrack::assocEMCaloDR05NoPUCalo ()             const { return CaloTotDR05NoPU(Calo, EM); };
+const float pat::IsolatedTrack::assocHadCaloDR05NoPUCalo ()            const { return CaloTotDR05NoPU(Calo, Had); };
 
-const float pat::IsolatedTrack::caloDR05NoPUCentralCalo ()             const { return CaloTotDR05NoPU(CentralCalo, Sum); };
-const float pat::IsolatedTrack::caloDR05NoPUCentralCaloEm ()           const { return CaloTotDR05NoPU(CentralCalo, EM); };
-const float pat::IsolatedTrack::caloDR05NoPUCentralCaloHad ()          const { return CaloTotDR05NoPU(CentralCalo, Had); };
+const float pat::IsolatedTrack::assocCaloDR05NoPUCentralCalo ()             const { return CaloTotDR05NoPU(CentralCalo, Sum); };
+const float pat::IsolatedTrack::assocEMCaloDR05NoPUCentralCalo ()           const { return CaloTotDR05NoPU(CentralCalo, EM); };
+const float pat::IsolatedTrack::assocHadCaloDR05NoPUCentralCalo ()          const { return CaloTotDR05NoPU(CentralCalo, Had); };
 

@@ -133,17 +133,17 @@ namespace pat {
        //////////////////////////////////////
 
        // New calculation that uses all rec hits in dR < 0.5 cone.
-       const float assocAllCaloDR05NoPU ()           const;
-       const float assocAllEMCaloDR05NoPU ()         const;
-       const float assocAllHadCaloDR05NoPU ()        const;
+       const float assocCaloDR05NoPU ()                  const;
+       const float assocEMCaloDR05NoPU ()                const;
+       const float assocHadCaloDR05NoPU ()               const;
      
-       const float assocCaloDR05NoPUCalo ()          const;
-       const float assocCaloDR05NoPUCaloEm ()        const;
-       const float assocCaloDR05NoPUCaloHad ()       const;
+       const float assocCaloDR05NoPUCalo ()              const;
+       const float assocEMCaloDR05NoPUCalo ()            const;
+       const float assocHadCaloDR05NoPUCalo ()           const;
 
-       const float caloDR05NoPUCentralCalo ()        const;
-       const float caloDR05NoPUCentralCaloEm ()      const;
-       const float caloDR05NoPUCentralCaloHad ()     const;
+       const float assocCaloDR05NoPUCentralCalo ()       const;
+       const float assocEMCaloDR05NoPUCentralCalo ()     const;
+       const float assocHadCaloDR05NoPUCentralCalo ()    const;
 
        //////////////////////////////////////
        // Set calo energies
