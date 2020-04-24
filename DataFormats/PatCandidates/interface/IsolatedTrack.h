@@ -128,22 +128,6 @@ namespace pat {
        const float assocHadCaloDR05 () const { return this->assocHadCaloDR05_; };
        const float assocCaloDR05 ()    const { return this->assocEMCaloDR05_ + this->assocHadCaloDR05_; };
 
-       //////////////////////////////////////
-       // Rho-corrected calo energies
-       //////////////////////////////////////
-
-       // New calculation that uses all rec hits in dR < 0.5 cone.
-       const float assocCaloDR05NoPU ()                  const;
-       const float assocEMCaloDR05NoPU ()                const;
-       const float assocHadCaloDR05NoPU ()               const;
-     
-       const float assocCaloDR05NoPUCalo ()              const;
-       const float assocEMCaloDR05NoPUCalo ()            const;
-       const float assocHadCaloDR05NoPUCalo ()           const;
-
-       const float assocCaloDR05NoPUCentralCalo ()       const;
-       const float assocEMCaloDR05NoPUCentralCalo ()     const;
-       const float assocHadCaloDR05NoPUCentralCalo ()    const;
 
        //////////////////////////////////////
        // Set calo energies
@@ -165,12 +149,6 @@ namespace pat {
        //////////////////////////////////////
 
        void set_trackIsoDR05 (double value) { trackIsoDR05_ = value; };
-
-       void set_trackIsoNoPUDR05 (double value) { trackIsoNoPUDR05_ = value; };
-
-       void set_trackIsoNoFakesDR05 (double value) { trackIsoNoFakesDR05_ = value; };
-
-       void set_trackIsoNoPUNoFakesDR05 (double value) { trackIsoNoPUNoFakesDR05_ = value; };
 
        void set_dEdx_pixel (double value, 
                             double error, 
@@ -253,9 +231,6 @@ namespace pat {
        float rhoPUCorrCentralCalo_;
    
        float trackIsoDR05_;
-       float trackIsoNoPUDR05_;
-       float trackIsoNoFakesDR05_;
-       float trackIsoNoPUNoFakesDR05_;
    
        const double getTrackIsolation (const reco::Track &, const std::vector<reco::Track> &, const double, const double = 1.0e-10) const;
    

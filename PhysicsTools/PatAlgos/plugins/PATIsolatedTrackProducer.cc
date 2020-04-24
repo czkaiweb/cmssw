@@ -125,19 +125,15 @@ namespace pat {
           edm::InputTag EBRecHitsTag_;
           edm::InputTag EERecHitsTag_;
           edm::InputTag HBHERecHitsTag_;
-//          edm::InputTag gt2dedxPixelTag_;
-//          edm::InputTag gt2dedxStripTag_;
           double candMinPt_;
 
-          edm::EDGetTokenT<std::vector<reco::Track> >       tracksToken_;
+          edm::EDGetTokenT<std::vector<reco::Track> >  tracksToken_;
           edm::EDGetTokenT<double>                     rhoToken_;
           edm::EDGetTokenT<double>                     rhoCaloToken_;
           edm::EDGetTokenT<double>                     rhoCentralCaloToken_;
           edm::EDGetTokenT<EBRecHitCollection>         EBRecHitsToken_;
           edm::EDGetTokenT<EERecHitCollection>         EERecHitsToken_;
           edm::EDGetTokenT<HBHERecHitCollection>       HBHERecHitsToken_;
-//          edm::EDGetTokenT<edm::ValueMap<reco::DeDxData> > gt2dedxStripToken_;
-//          edm::EDGetTokenT<edm::ValueMap<reco::DeDxData> > gt2dedxPixelToken_;
 
           edm::ESHandle<CaloGeometry> caloGeometry_;
           bool insideCone(const pat::IsolatedTrack &, const DetId &, const double) const;
