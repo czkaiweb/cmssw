@@ -24,6 +24,13 @@ _exoHighPtTrackCut = (
     " abs(dxy) < 0.5 && abs(dz) < 0.5 && "+
     " (miniPFIsolation().chargedHadronIso()/pt < 1.0 || pt > 100)"
 )
+_exoDisappearingTrackCut = (
+    "pt > 35 && "+
+    "abs(dxy) < 0.05 && abs(dz) < 1.0 &&"+
+    "missingInnerHits_ == 0 && missingMiddleHits_ == 0 &&"+
+    "(assocCaloDR05() - rhoPUCorr()*3.14*0.5*0.5) < 10.0 "
+)
+
 isolatedTracks = cms.EDProducer("PATIsolatedTrackProducer",
     tkAssocParamBlock,
     packedPFCandidates = cms.InputTag("packedPFCandidates"),
@@ -68,7 +75,7 @@ isolatedTracks = cms.EDProducer("PATIsolatedTrackProducer",
     pfneutralsum_DR = cms.double(0.05),
 
     saveDeDxHitInfo = cms.bool(True),
-    saveDeDxHitInfoCut = cms.string("(%s) || (%s)" % (_susySoftDisappearingTrackCut,_exoHighPtTrackCut)), 
+    saveDeDxHitInfoCut = cms.string("(%s) || (%s) || (%s)" % (_susySoftDisappearingTrackCut,_exoHighPtTrackCut,_exoDisappearingTrackCut)), 
 
 )
 
