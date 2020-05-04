@@ -116,37 +116,15 @@ namespace pat {
        const PackedCandidateRef& nearestPFPackedCandRef() const { return nearestPFPackedCandRef_; }
        const PackedCandidateRef& nearestLostTrackPackedCandRef() const { return nearestPFPackedCandRef_; }
 
-       enum RhoType { All, Calo, CentralCalo };
-       enum CaloType { Sum, EM, Had };
-
-       //////////////////////////////////////
-       // Un-corrected (rho) calo energies
-       //////////////////////////////////////
-
-       // New calculation that uses all rec hits in dR < 0.5 cone.
        const float assocEMCaloDR05 ()  const { return this->assocEMCaloDR05_; };
        const float assocHadCaloDR05 () const { return this->assocHadCaloDR05_; };
-       const float assocCaloDR05 ()    const { return this->assocEMCaloDR05_ + this->assocHadCaloDR05_; };
-
-
-       //////////////////////////////////////
-       // Set calo energies
-       //////////////////////////////////////
 
        void set_assocEMCaloDR05 (double value) { assocEMCaloDR05_  = value; };
        void set_assocHadCaloDR05 (double value) { assocHadCaloDR05_ = value; };
 
-       //////////////////////////////////////
-       // Set rhos
-       //////////////////////////////////////
-
        void set_rhoPUCorr  (double value) { rhoPUCorr_   = value; };
        void set_rhoPUCorrCalo         (double value) { rhoPUCorrCalo_   = value; };
        void set_rhoPUCorrCentralCalo  (double value) { rhoPUCorrCentralCalo_   = value; };
-
-       //////////////////////////////////////
-       // Set track isolations
-       //////////////////////////////////////
 
        void set_trackIsoDR05 (double value) { trackIsoDR05_ = value; };
 
@@ -169,17 +147,9 @@ namespace pat {
            dEdxStrip_numberOfMeasurements_ = nMeasurements;
        };
 
-       //////////////////////////////////////
-       // Get rhos
-       //////////////////////////////////////
-
        const float rhoPUCorr ()            const { return this->rhoPUCorr_; };
        const float rhoPUCorrCalo ()        const { return this->rhoPUCorrCalo_; };
        const float rhoPUCorrCentralCalo () const { return this->rhoPUCorrCentralCalo_; };
-
-       //////////////////////////////////////
-       // Get track isolations
-       //////////////////////////////////////
 
        const float trackIsoDR05 ()            const { return this->trackIsoDR05_; };
 
@@ -191,12 +161,6 @@ namespace pat {
        float dEdxPixel_Error                 () const { return this->dEdxPixel_Error_; };
        int dEdxPixel_nSaturatedMeasurements  () const { return this->dEdxPixel_numberOfSaturatedMeasurements_; };
        unsigned int dEdxPixel_nMeasurements  () const { return this->dEdxPixel_numberOfMeasurements_; };
-
-       // missing hits differentiated by location on track
-       // re-implement these methods from osu::Track to provide a getter function when plotting osu::Track::matchedCandidateTrack()
-       const unsigned char missingInnerHits_ ()  const { return this->hitPattern().trackerLayersWithoutMeasurement(reco::HitPattern::MISSING_INNER_HITS); };
-       const unsigned char missingMiddleHits_ () const { return this->hitPattern().trackerLayersWithoutMeasurement(reco::HitPattern::TRACK_HITS); };
-       const unsigned char missingOuterHits_ ()  const { return this->hitPattern().trackerLayersWithoutMeasurement(reco::HitPattern::MISSING_OUTER_HITS); };
 
      protected:
        PFIsolation pfIsolationDR03_;
@@ -233,8 +197,6 @@ namespace pat {
        float trackIsoDR05_;
    
        const double getTrackIsolation (const reco::Track &, const std::vector<reco::Track> &, const double, const double = 1.0e-10) const;
-   
-       const double CaloTotDR05NoPU (RhoType, CaloType) const;
 
      };
    

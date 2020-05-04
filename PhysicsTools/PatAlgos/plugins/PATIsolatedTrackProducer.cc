@@ -183,8 +183,6 @@ pat::PATIsolatedTrackProducer::PATIsolatedTrackProducer(const edm::ParameterSet&
       EBRecHitsTag_     (iConfig.getParameter<edm::InputTag> ("EBRecHits")),
       EERecHitsTag_     (iConfig.getParameter<edm::InputTag> ("EERecHits")),
       HBHERecHitsTag_   (iConfig.getParameter<edm::InputTag> ("HBHERecHits")),
-//      gt2dedxPixelTag_  (iConfig.getParameter<edm::InputTag> ("dEdxDataPixel")),
-//      gt2dedxStripTag_  (iConfig.getParameter<edm::InputTag> ("dEdxDataStrip")),
       candMinPt_        (iConfig.getParameter<double> ("candMinPt")) {
   // TrackAssociator parameters
   edm::ParameterSet parameters = iConfig.getParameter<edm::ParameterSet>("TrackAssociatorParameters");
@@ -211,8 +209,6 @@ pat::PATIsolatedTrackProducer::PATIsolatedTrackProducer(const edm::ParameterSet&
   EBRecHitsToken_       = consumes<EBRecHitCollection>            (EBRecHitsTag_);
   EERecHitsToken_       = consumes<EERecHitCollection>            (EERecHitsTag_);
   HBHERecHitsToken_     = consumes<HBHERecHitCollection>          (HBHERecHitsTag_);
-//  gt2dedxPixelToken_    = consumes<edm::ValueMap<reco::DeDxData> > (gt2dedxPixelTag_);
-//  gt2dedxStripToken_    = consumes<edm::ValueMap<reco::DeDxData> > (gt2dedxStripTag_);
 }
 
 pat::PATIsolatedTrackProducer::~PATIsolatedTrackProducer() {}

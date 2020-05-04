@@ -27,7 +27,7 @@ _exoHighPtTrackCut = (
 _exoDisappearingTrackCut = (
     "pt > 35 && "+
     "abs(dxy) < 0.05 && abs(dz) < 1.0 &&"+
-    "missingInnerHits_ == 0 && missingMiddleHits_ == 0 &&"+
+    "hitPattern().trackerLayersWithoutMeasurement(reco::HitPattern::MISSING_INNER_HITS) == 0 && hitPattern().trackerLayersWithoutMeasurement(reco::HitPattern::TRACK_HITS) == 0 && hitPattern().trackerLayersWithoutMeasurement(reco::HitPattern::MISSING_OUTER_HITS) >= 1 &&"+
     "(assocCaloDR05() - rhoPUCorr()*3.14*0.5*0.5) < 10.0 "
 )
 
