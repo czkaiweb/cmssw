@@ -39,9 +39,6 @@ namespace pat {
           nearestLostTrackPackedCandRef_(PackedCandidateRef()),
           assocEMCaloDR05_           (-1.),
           assocHadCaloDR05_          (-1.),
-          rhoPUCorr_               (-1.),
-          rhoPUCorrCalo_           (-1.),
-          rhoPUCorrCentralCalo_    (-1.),
           trackIsoDR05_            (-1.){}
 
         explicit IsolatedTrack(const PFIsolation &iso, const PFIsolation &miniiso, float caloJetEm, float caloJetHad,
@@ -68,9 +65,6 @@ namespace pat {
           nearestLostTrackPackedCandRef_(refToNearestLostTrack),
           assocEMCaloDR05_           (-1.),
           assocHadCaloDR05_          (-1.),
-          rhoPUCorr_               (-1.),
-          rhoPUCorrCalo_           (-1.),
-          rhoPUCorrCentralCalo_    (-1.),
           trackIsoDR05_            (getTrackIsolation (track, tracks, 0.5)){}
 
         ~IsolatedTrack() override {}
@@ -122,10 +116,6 @@ namespace pat {
        void set_assocEMCaloDR05 (double value) { assocEMCaloDR05_  = value; };
        void set_assocHadCaloDR05 (double value) { assocHadCaloDR05_ = value; };
 
-       void set_rhoPUCorr  (double value) { rhoPUCorr_   = value; };
-       void set_rhoPUCorrCalo         (double value) { rhoPUCorrCalo_   = value; };
-       void set_rhoPUCorrCentralCalo  (double value) { rhoPUCorrCentralCalo_   = value; };
-
        void set_trackIsoDR05 (double value) { trackIsoDR05_ = value; };
 
        void set_dEdx_pixel (double value, 
@@ -146,10 +136,6 @@ namespace pat {
            dEdxStrip_numberOfSaturatedMeasurements_ = nSaturatedMeasurements;
            dEdxStrip_numberOfMeasurements_ = nMeasurements;
        };
-
-       const float rhoPUCorr ()            const { return this->rhoPUCorr_; };
-       const float rhoPUCorrCalo ()        const { return this->rhoPUCorrCalo_; };
-       const float rhoPUCorrCentralCalo () const { return this->rhoPUCorrCentralCalo_; };
 
        const float trackIsoDR05 ()            const { return this->trackIsoDR05_; };
 
@@ -189,10 +175,6 @@ namespace pat {
    
        float assocEMCaloDR05_;
        float assocHadCaloDR05_;
-   
-       float rhoPUCorr_;
-       float rhoPUCorrCalo_;
-       float rhoPUCorrCentralCalo_;
    
        float trackIsoDR05_;
    

@@ -119,18 +119,12 @@ namespace pat {
           const CaloEnergy calculateCaloE (const pat::IsolatedTrack &, const EBRecHitCollection &, const EERecHitCollection &, const HBHERecHitCollection &, const double dR = 0.5) const;
 
           edm::InputTag tracksTag_;
-          edm::InputTag rhoTag_;
-          edm::InputTag rhoCaloTag_;
-          edm::InputTag rhoCentralCaloTag_;
           edm::InputTag EBRecHitsTag_;
           edm::InputTag EERecHitsTag_;
           edm::InputTag HBHERecHitsTag_;
           double candMinPt_;
 
           edm::EDGetTokenT<std::vector<reco::Track> >  tracksToken_;
-          edm::EDGetTokenT<double>                     rhoToken_;
-          edm::EDGetTokenT<double>                     rhoCaloToken_;
-          edm::EDGetTokenT<double>                     rhoCentralCaloToken_;
           edm::EDGetTokenT<EBRecHitCollection>         EBRecHitsToken_;
           edm::EDGetTokenT<EERecHitCollection>         EERecHitsToken_;
           edm::EDGetTokenT<HBHERecHitCollection>       HBHERecHitsToken_;
@@ -177,13 +171,9 @@ pat::PATIsolatedTrackProducer::PATIsolatedTrackProducer(const edm::ParameterSet&
       saveDeDxHitInfo_(iConfig.getParameter<bool>("saveDeDxHitInfo")),
       saveDeDxHitInfoCut_(iConfig.getParameter<std::string>("saveDeDxHitInfoCut")),
       tracksTag_        (iConfig.getParameter<edm::InputTag> ("tracks")),
-      rhoTag_           (iConfig.getParameter<edm::InputTag> ("rhoTag")),
-      rhoCaloTag_       (iConfig.getParameter<edm::InputTag> ("rhoCaloTag")),
-      rhoCentralCaloTag_(iConfig.getParameter<edm::InputTag> ("rhoCentralCaloTag")),
       EBRecHitsTag_     (iConfig.getParameter<edm::InputTag> ("EBRecHits")),
       EERecHitsTag_     (iConfig.getParameter<edm::InputTag> ("EERecHits")),
       HBHERecHitsTag_   (iConfig.getParameter<edm::InputTag> ("HBHERecHits")),
-      candMinPt_        (iConfig.getParameter<double> ("candMinPt")) {
   // TrackAssociator parameters
   edm::ParameterSet parameters = iConfig.getParameter<edm::ParameterSet>("TrackAssociatorParameters");
   edm::ConsumesCollector iC = consumesCollector();
@@ -203,9 +193,6 @@ pat::PATIsolatedTrackProducer::PATIsolatedTrackProducer(const edm::ParameterSet&
   }
 
   tracksToken_          = consumes<std::vector<reco::Track> >          (tracksTag_);
-  rhoToken_             = consumes<double>                        (rhoTag_);
-  rhoCaloToken_         = consumes<double>                        (rhoCaloTag_);
-  rhoCentralCaloToken_  = consumes<double>                        (rhoCentralCaloTag_);
   EBRecHitsToken_       = consumes<EBRecHitCollection>            (EBRecHitsTag_);
   EERecHitsToken_       = consumes<EERecHitCollection>            (EERecHitsTag_);
   HBHERecHitsToken_     = consumes<HBHERecHitCollection>          (HBHERecHitsTag_);
@@ -267,12 +254,6 @@ void pat::PATIsolatedTrackProducer::produce(edm::Event& iEvent, const edm::Event
 
   edm::Handle<std::vector<reco::Track> > tracks;
   iEvent.getByToken (tracksToken_, tracks );
-  edm::Handle<double> rhoHandle;
-  iEvent.getByToken (rhoToken_, rhoHandle );
-  edm::Handle<double> rhoCaloHandle;
-  iEvent.getByToken (rhoCaloToken_, rhoCaloHandle );
-  edm::Handle<double> rhoCentralCaloHandle;
-  iEvent.getByToken (rhoCentralCaloToken_, rhoCentralCaloHandle );
 
   edm::ESHandle<MagneticField> magneticField;
   iSetup.get<IdealMagneticFieldRecord>().get(magneticField);
@@ -491,9 +472,6 @@ void pat::PATIsolatedTrackProducer::produce(edm::Event& iEvent, const edm::Event
                                           refToNearestLostTrack,
                                           gentk,
                                           *gt_h);
-    isolatedTrack.set_rhoPUCorr(*rhoHandle);
-    isolatedTrack.set_rhoPUCorrCalo(*rhoCaloHandle);
-    isolatedTrack.set_rhoPUCorrCentralCalo(*rhoCentralCaloHandle);
 
     const CaloEnergy &caloE_0p5 = calculateCaloE(isolatedTrack, *EBRecHits, *EERecHits, *HBHERecHits, 0.5);
     isolatedTrack.set_assocEMCaloDR05 (caloE_0p5.eEM);
@@ -620,9 +598,6 @@ void pat::PATIsolatedTrackProducer::produce(edm::Event& iEvent, const edm::Event
                                               ecalStatus, hcalStatus, deltaEta, deltaPhi, refToCand,
 					      refToNearestPF, refToNearestLostTrack,gentk,gentks);
 
-    isolatedTrack.set_rhoPUCorr(*rhoHandle);
-    isolatedTrack.set_rhoPUCorrCalo(*rhoCaloHandle);
-    isolatedTrack.set_rhoPUCorrCentralCalo(*rhoCentralCaloHandle);
 
     const CaloEnergy &caloE_0p5 = calculateCaloE(isolatedTrack, *EBRecHits, *EERecHits, *HBHERecHits, 0.5);
     isolatedTrack.set_assocEMCaloDR05 (caloE_0p5.eEM);

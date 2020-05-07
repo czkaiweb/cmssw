@@ -28,7 +28,7 @@ _exoDisappearingTrackCut = (
     "pt > 35 && "+
     "abs(dxy) < 0.05 && abs(dz) < 1.0 &&"+
     "hitPattern().trackerLayersWithoutMeasurement(reco::HitPattern::MISSING_INNER_HITS) == 0 && hitPattern().trackerLayersWithoutMeasurement(reco::HitPattern::TRACK_HITS) == 0 && hitPattern().trackerLayersWithoutMeasurement(reco::HitPattern::MISSING_OUTER_HITS) >= 1 &&"+
-    "(assocCaloDR05() - rhoPUCorr()*3.14*0.5*0.5) < 10.0 "
+    "trackIsoDR05/pt < 0.1 "
 )
 
 isolatedTracks = cms.EDProducer("PATIsolatedTrackProducer",
@@ -43,13 +43,9 @@ isolatedTracks = cms.EDProducer("PATIsolatedTrackProducer",
     dEdxHitInfo = cms.InputTag("dedxHitInfo"),
     dEdxHitInfoPrescale = cms.InputTag("dedxHitInfo","prescale"), 
     tracks             =  cms.InputTag  ("generalTracks",                  ""),
-    rhoTag             =  cms.InputTag  ("fixedGridRhoFastjetAll"),
-    rhoCaloTag         =  cms.InputTag  ("fixedGridRhoFastjetAllCalo"),
-    rhoCentralCaloTag  =  cms.InputTag  ("fixedGridRhoFastjetCentralCalo"),
     EBRecHits          =  cms.InputTag  ("reducedEcalRecHitsEB"),
     EERecHits          =  cms.InputTag  ("reducedEcalRecHitsEE"),
     HBHERecHits        =  cms.InputTag  ("reducedHcalRecHits", "hbhereco"),
-    candMinPt          =  cms.double(10),
 
     addPrescaledDeDxTracks = cms.bool(False),
     usePrecomputedDeDxStrip = cms.bool(True),        # if these are set to True, will get estimated DeDx from DeDxData branches
