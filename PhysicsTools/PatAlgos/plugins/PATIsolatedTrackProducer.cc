@@ -173,7 +173,7 @@ pat::PATIsolatedTrackProducer::PATIsolatedTrackProducer(const edm::ParameterSet&
       tracksTag_        (iConfig.getParameter<edm::InputTag> ("tracks")),
       EBRecHitsTag_     (iConfig.getParameter<edm::InputTag> ("EBRecHits")),
       EERecHitsTag_     (iConfig.getParameter<edm::InputTag> ("EERecHits")),
-      HBHERecHitsTag_   (iConfig.getParameter<edm::InputTag> ("HBHERecHits")),
+      HBHERecHitsTag_   (iConfig.getParameter<edm::InputTag> ("HBHERecHits")){
   // TrackAssociator parameters
   edm::ParameterSet parameters = iConfig.getParameter<edm::ParameterSet>("TrackAssociatorParameters");
   edm::ConsumesCollector iC = consumesCollector();
