@@ -478,7 +478,7 @@ void pat::PATIsolatedTrackProducer::produce(edm::Event& iEvent, const edm::Event
     isolatedTrack.set_assocHadCaloDR05 (caloE_0p5.eHad);
 
    if(gt2dedxPixel->contains(tkref.id())) {
-      isolatedTrack.set_dEdx_pixel((*gt2dedxPixel)[tkref].dEdx(),
+      isolatedTrack.set_dEdx_pixel((dEdxPixel,
                                    (*gt2dedxPixel)[tkref].dEdxError(),
                                    (*gt2dedxPixel)[tkref].numberOfSaturatedMeasurements(),
                                    (*gt2dedxPixel)[tkref].numberOfMeasurements());
@@ -488,7 +488,7 @@ void pat::PATIsolatedTrackProducer::produce(edm::Event& iEvent, const edm::Event
     }
 
     if(gt2dedxStrip->contains(tkref.id())) {
-      isolatedTrack.set_dEdx_strip((*gt2dedxStrip)[tkref].dEdx(),
+      isolatedTrack.set_dEdx_strip((dEdxStrip,
                                    (*gt2dedxStrip)[tkref].dEdxError(),
                                    (*gt2dedxStrip)[tkref].numberOfSaturatedMeasurements(),
                                    (*gt2dedxStrip)[tkref].numberOfMeasurements());
